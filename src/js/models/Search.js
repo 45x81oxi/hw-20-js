@@ -1,5 +1,4 @@
-
-export default  class  Search {
+export default class Search {
     constructor(query) {
         this.query = query;
         this.result = {};

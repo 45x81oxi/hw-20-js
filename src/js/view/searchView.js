@@ -6,6 +6,7 @@ export const clearForm = () => elements.searchForm.reset();
 
 export const clearResults = () => {
     elements.searchResList.innerHTML = '';
+    elements.searchResPages.innerHTML = '';
 };
 
 const renderRecipe = recipe => {
@@ -23,11 +24,47 @@ const renderRecipe = recipe => {
   </li>
    `;
 
-    elements.searchResList.insertAdjacentHTML("afterbegin", markup);
+    elements.searchResList.insertAdjacentHTML("beforeend", markup);
 };
 
-export const renderResult = (recipes) => {
-    console.log(recipes);
+const createButton = (page, type) => {
+    return `
+      <button class="btn-inline results__btn--${type}" data-goto="${type === 'prev' ? page - 1 : page + 1}">
+          <span>Page ${type === 'prev' ? page - 1 : page + 1}</span>
+          <svg class="search__icon">
+               <use href="img/icons.svg#icon-triangle-${type === 'prev' ? 'left' : 'right'}"></use>
+          </svg>
+      </button>
+    `;
+};
+
+const renderButtons = (page, numResult, resPerPage) => {
+    // считаем количество страниц
+    const pages = Math.ceil(numResult / resPerPage);
+    let button;
+
+    if (page === 1 && pages > 1) {
+        //  кнопка вперед
+        button = createButton(page, 'next');
+    } else if (page < pages) {
+        // обе кнопки
+        button = `
+        ${ createButton(page, 'prev')}
+        ${ createButton(page, 'next')}
+        `;
+    } else if (page === pages) {
+        // кнопка назад
+        button = createButton(page, 'prev');
+    }
+
+    elements.searchResPages.insertAdjacentHTML("afterbegin", button);
+};
+
+export const renderResult = (recipes, page = 1, resPerPage = 10) => {
+    const start = (page - 1) * resPerPage;
+    const end = page * resPerPage;
     // перебираем массив рецептов на каждой итерации отправляя один рецепт в функцию renderRecipe
-    recipes.forEach(renderRecipe);
+    recipes.slice(start, end).forEach(renderRecipe);
+
+    renderButtons(page, recipes.length, resPerPage);
 };
