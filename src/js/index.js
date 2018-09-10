@@ -1,7 +1,15 @@
 // Global app controller
 import Search from './models/Search';
+import Recipe from './models/Recipe';
+import List from './models/List';
+import Likes from './models/Likes';
+import Storage from './storage';
+
+import { elements, renderLoader, clearLoader } from "./view/base";
 import * as searchView from './view/searchView';
-import {elements, renderLoader, clearLoader} from "./view/base";
+import * as recipeView from './view/recipeView';
+import * as listView from './view/listView';
+import * as likesView from './view/likesView';
 
 /** Global state of the app
  * - Search object
@@ -12,8 +20,9 @@ import {elements, renderLoader, clearLoader} from "./view/base";
 
 const state = {};
 
+// Search controller
 const controlSearch = async () => {
-    //1. полчать данные из view
+    //1. получать данные из view
     const query = searchView.getSearchInputValue();
 
     if (query) {
@@ -48,3 +57,87 @@ elements.searchResPages.addEventListener('click', e => {
         searchView.renderResult(state.search.result, goToPage);
     }
 });
+
+
+// Recipe controller
+const controlRecipe = async () => {
+    // Get ID from url
+    const id = window.location.hash.replace('#', '');
+
+    if (id) {
+        // highlight active
+        if (state.search) searchView.highLightSelected(id);
+        recipeView.clearRecipe();
+        renderLoader(elements.recipe);
+
+        // Create new recipe object
+        state.recipe = new Recipe(id);
+
+        // Get recipe data
+        await state.recipe.getRecipe();
+
+        clearLoader();
+        recipeView.renderRecipe(state.recipe.result);
+    }
+};
+
+window.addEventListener('hashchange', controlRecipe);
+window.addEventListener('load', controlRecipe);
+
+
+// List controller
+const listItem = new List();
+
+const controlShoppingList = (e) => {
+    if (e.target.closest('.recipe__btn')) {
+        listItem.items = [];
+        listView.clearList();
+        if (state.recipe.id) {
+            state.recipe.result.ingredients.forEach(ingredient => listItem.addItem(ingredient));
+            listItem.items.forEach(item => listView.renderList(item));
+        }
+    }
+};
+
+const deleteIngredient = (e) => {
+    if (e.target.closest('.shopping__delete')) {
+        listItem.deleteItem(e.target.closest('.shopping__delete').dataset.id);
+        listView.clearList();
+        listItem.items.forEach(item => listView.renderList(item));
+    }
+};
+elements.recipe.addEventListener('click', controlShoppingList);
+elements.addSoppingList.addEventListener('click', deleteIngredient);
+
+
+// Likes controller
+const likes = new Likes();
+const store = new Storage();
+store.getLikesRecipe().forEach(like => likesView.renderLike(like));
+
+const addLike = (e) => {
+    if (e.target.closest('.header__likes')) {
+        if (store.uniqueId(state.recipe.id)) {
+            alert('Recipe already added to favorites!');
+            return;
+        }
+
+        store.addLikeRecipe(likes.addLike(state.recipe.result));
+        if (state.recipe.id) {
+            likesView.renderLike(state.recipe.result);
+        }
+    }
+};
+
+const deleteLikes = (e) => {
+    if (e.target.closest('.like__delete')) {
+        const id = e.target.closest('.like__delete').dataset.id;
+        likes.deleteLike(id);
+        store.deleteLikeRecipe(id);
+        likesView.clearList();
+        likes.items.forEach(like => likesView.renderLike(like));
+    }
+};
+
+elements.recipe.addEventListener('click', addLike);
+elements.likesList.addEventListener('click', deleteLikes);

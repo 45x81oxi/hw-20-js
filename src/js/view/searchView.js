@@ -1,4 +1,4 @@
-import {elements} from "./base";
+import { elements } from "./base";
 
 export const getSearchInputValue = () => elements.searchInput.value;
 
@@ -9,10 +9,16 @@ export const clearResults = () => {
     elements.searchResPages.innerHTML = '';
 };
 
+export  const highLightSelected = id => {
+    const resultsArr = document.querySelectorAll('.results__link');
+    resultsArr.forEach(el => el.classList.remove('results__link--active'));
+    document.querySelector(`.results__link[href*="${id}"]`).classList.add('results__link--active');
+};
+
 const renderRecipe = recipe => {
     const markup = `
   <li>
-    <a class="results__link results__link--active" href="#{recipe.revipe_id}">
+    <a class="results__link" href="#${recipe.recipe_id}">
         <figure class="results__fig">
             <img src="${recipe.image_url}" alt="${recipe.title}">
         </figure>
