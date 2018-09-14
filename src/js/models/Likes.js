@@ -9,7 +9,7 @@ export default class Likes {
             image_url: recipe.image_url,
             publisher: recipe.publisher,
             title: recipe.title
-        }
+        };
         this.items.push(newItem);
             return newItem;
     }

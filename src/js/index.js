@@ -161,7 +161,7 @@ elements.addSoppingList.addEventListener('click', deleteIngredient);
 // Likes controller
 const likes = new Likes();
 const store = new Storage();
-store.getLikesRecipe().forEach(like => likesView.renderLike(like));
+Storage.getLikesRecipe().forEach(like => likesView.renderLike(like));
 
 const addLike = (e) => {
     if (e.target.closest('.header__likes')) {
@@ -170,7 +170,7 @@ const addLike = (e) => {
             return;
         }
 
-        store.addLikeRecipe(likes.addLike(state.recipe.result));
+        Storage.addLikeRecipe(likes.addLike(state.recipe.result));
         if (state.recipe.id) {
             likesView.renderLike(state.recipe.result);
         }
@@ -189,5 +189,3 @@ const deleteLikes = (e) => {
 
 elements.recipe.addEventListener('click', addLike);
 elements.likesList.addEventListener('click', deleteLikes);
-
-

@@ -1,7 +1,7 @@
 import { elements } from "./base";
 
 export const clearRecipe = () => elements.recipe.innerHTML = "";
-// recipe__ingredient-list
+
 export const createIngredient = ingredients => {
     const markup = `
  <li class="recipe__item">

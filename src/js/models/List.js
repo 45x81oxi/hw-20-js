@@ -29,7 +29,7 @@ export default class List {
                 spoon,
                 text
             }
-        }
+        };
 
         this.items.push(newItem);
 

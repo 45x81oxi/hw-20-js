@@ -1,5 +1,5 @@
 export default class Storage {
-    getLikesRecipe() {
+    static getLikesRecipe() {
         let recipes;
         if (!localStorage.getItem('recipes')) {
             recipes = [];
@@ -9,18 +9,17 @@ export default class Storage {
         return recipes;
     }
 
-    addLikeRecipe(recipe) {
-        const recipes = this.getLikesRecipe();
+    static addLikeRecipe(recipe) {
+        const recipes = Storage.getLikesRecipe();
         recipes.unshift(recipe);
         localStorage.setItem('recipes', JSON.stringify(recipes));
     }
 
     deleteLikeRecipe(id) {
-        const _recipes = this.getLikesRecipe();
+        const _recipes = Storage.getLikesRecipe();
         _recipes.forEach((item, i) => {
             if (item.recipe_id === id) {
                 _recipes.splice(i, 1);
-                return;
             }
         });
         localStorage.setItem('recipes', JSON.stringify(_recipes));
@@ -28,10 +27,10 @@ export default class Storage {
 
     uniqueId(id) {
         let marker = 0;
-        const recipes = this.getLikesRecipe();
+        const recipes = Storage.getLikesRecipe();
         recipes.forEach(item => {
             if (item.recipe_id === id) marker = 1;
-        })
+        });
         return marker;
     }
 
