@@ -81,18 +81,65 @@ const controlRecipe = async () => {
     }
 };
 
+// change in the number of portions and times
+const changePeople = (e) => {
+    if (e.target.closest('.btn-tiny')) {
+
+        const sign = e.target.closest('.btn-tiny').getAttribute('name');
+        const countPeople = elements.recipe.querySelector('.recipe__info-data--people');
+        const minutes = elements.recipe.querySelector('.recipe__info-data--minutes');
+
+        let count = +countPeople.innerHTML;
+        let index = 1;
+        if (sign === 'minus' && count >= 2) {
+            --count;
+        }
+        else if (sign === 'plus' && count <= 12) {
+            ++count;
+        }
+        if (count < 3) {
+            minutes.innerHTML = 35;
+        }
+        else if (count > 8) {
+            minutes.innerHTML = 60;
+        }
+        else minutes.innerHTML = 45;
+        countPeople.innerHTML = count;
+
+        changeCountIngredient(count === 4 ? 1 : index * count / 4);
+    }
+};
+
+
 window.addEventListener('hashchange', controlRecipe);
 window.addEventListener('load', controlRecipe);
+elements.recipe.addEventListener('click', changePeople);
 
 
 // List controller
-const listItem = new List();
 
+// change in the number of ingredients
+let arrCountIngredient = [];
+const changeCountIngredient = (index) => {
+
+    arrCountIngredient = listView.listIngredients.slice(0);
+    listView.listIngredients.splice(0, listView.listIngredients.length);
+    listView.clearList();
+    arrCountIngredient.forEach(item => listView.renderList(item, index));
+};
+
+
+const listItem = new List();
 const controlShoppingList = (e) => {
     if (e.target.closest('.recipe__btn')) {
+        const countPeople = elements.recipe.querySelector('.recipe__info-data--people');
+        const minutes = elements.recipe.querySelector('.recipe__info-data--minutes');
+        countPeople.innerHTML = 4;
+        minutes.innerHTML = 45;
         listItem.items = [];
         listView.clearList();
         if (state.recipe.id) {
+            listView.listIngredients.splice(0, listView.listIngredients.length);
             state.recipe.result.ingredients.forEach(ingredient => listItem.addItem(ingredient));
             listItem.items.forEach(item => listView.renderList(item));
         }
@@ -106,6 +153,7 @@ const deleteIngredient = (e) => {
         listItem.items.forEach(item => listView.renderList(item));
     }
 };
+
 elements.recipe.addEventListener('click', controlShoppingList);
 elements.addSoppingList.addEventListener('click', deleteIngredient);
 
@@ -141,3 +189,5 @@ const deleteLikes = (e) => {
 
 elements.recipe.addEventListener('click', addLike);
 elements.likesList.addEventListener('click', deleteLikes);
+
+

@@ -1,5 +1,6 @@
 import { api, key, proxy } from "../config";
 
+
 export default class Recipe {
     constructor(id) {
         this.id = id;
@@ -15,4 +16,5 @@ export default class Recipe {
             alert(error);
         }
     }
+
 }
